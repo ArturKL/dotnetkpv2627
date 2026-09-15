@@ -1,0 +1,37 @@
+@Auth_HostAddress = http://localhost:5263
+
+POST {{Auth_HostAddress}}/auth/signup
+Content-Type: application/json
+
+{
+  "username": "arthur",
+  "password": "123456",
+  "repeatPassword": "123456"
+}
+
+###
+
+POST {{Auth_HostAddress}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "arthur",
+  "password": "123456"
+}
+
+###
+
+GET {{Auth_HostAddress}}/users/arthur
+
+### 
+
+PUT {{Auth_HostAddress}}/users/arthur
+Content-Type: application/json
+
+{
+  "description": "hi!!"
+}
+
+###
+
+DELETE {{Auth_HostAddress}}/users/arthur
