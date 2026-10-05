@@ -1,4 +1,5 @@
 using Auth.Dtos;
+using Auth.Dtos.Validators;
 using Auth.Models;
 using Auth.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -10,6 +11,20 @@ namespace Auth.Controllers;
 [Route("users")]
 public class UserController(IUserService userService) : ControllerBase
 {
+    [HttpPost]
+    public async Task<IActionResult> SearchUsers(SearchUsersDto dto, SearchUsersDtoValidator validator)
+    {
+        var result = await validator.ValidateAsync(dto);
+        if (!result.IsValid)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        var users = await userService.SearchUsersAsync(dto);
+        
+        return Ok(users);
+    }
+
     [HttpGet("{username}")]
     public async Task<IActionResult> Get(string username)
     {
@@ -18,14 +33,20 @@ public class UserController(IUserService userService) : ControllerBase
         {
             return NotFound();
         }
-        
+
         return Ok(new UserDto(user.Username, user.Description));
     }
 
     [HttpPut("{username}")]
     [Authorize]
-    public async Task<IActionResult> Update(string username, UpdateUserDto dto)
+    public async Task<IActionResult> Update(string username, UpdateUserDto dto, UpdateUserDtoValidator validator)
     {
+        var result = await validator.ValidateAsync(dto);
+        if (!result.IsValid)
+        {
+            return BadRequest(result.Errors);
+        }
+
         var currentUser = User.Identity?.Name;
         if (currentUser == null || currentUser != username)
         {
@@ -37,7 +58,7 @@ public class UserController(IUserService userService) : ControllerBase
         {
             return NotFound();
         }
-        
+
         return Ok(new UserDto(user.Username, user.Description));
     }
 
@@ -56,7 +77,7 @@ public class UserController(IUserService userService) : ControllerBase
         {
             return BadRequest();
         }
-        
+
         return Ok();
     }
 }

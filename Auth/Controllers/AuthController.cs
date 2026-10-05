@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Auth.Dtos;
+using Auth.Dtos.Validators;
 using Auth.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -12,13 +13,14 @@ namespace Auth.Controllers;
 public class AuthController : ControllerBase
 {
     [HttpPost("signup")]
-    public async Task<IActionResult> Signup([FromBody] SignupDto dto, IAuthService authService)
+    public async Task<IActionResult> Signup([FromBody] SignupDto dto, SignupDtoValidator validator, IAuthService authService)
     {
-        if (dto.Password != dto.RepeatPassword)
+        var result = await validator.ValidateAsync(dto);
+        if (!result.IsValid)
         {
-            return BadRequest("Passwords do not match");
+            return BadRequest(result.Errors);
         }
-
+        
         var user = await authService.SignupAsync(dto.Username, dto.Password);
         if (user == null)
         {
@@ -29,8 +31,14 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto dto, IAuthService authService)
+    public async Task<IActionResult> Login([FromBody] LoginDto dto, LoginDtoValidator validator, IAuthService authService)
     {
+        var result = await validator.ValidateAsync(dto);
+        if (!result.IsValid)
+        {
+            return BadRequest(result.Errors);
+        }
+        
         var user = await authService.LoginAsync(dto.Username, dto.Password);
         if (user == null)
         {

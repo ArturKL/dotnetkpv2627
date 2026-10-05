@@ -1,5 +1,7 @@
 using Auth.Database;
+using Auth.Dtos.Validators;
 using Auth.Services;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +17,7 @@ var connectionString = builder.Configuration.GetSection("Database").GetSection("
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+builder.Services.AddValidatorsFromAssemblyContaining<SignupDtoValidator>();
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 
