@@ -5,7 +5,7 @@ namespace Auth.Services;
 
 public interface IAuthService
 {
-    public Task<User?> SignupAsync(string username, string password);
+    public Task<User?> SignupAsync(string username, string password, CancellationToken cancellationToken = default);
     
-    public Task<User?> LoginAsync(string username, string password);
+    public Task<User?> LoginAsync(string username, string password, CancellationToken cancellationToken = default);
 }
